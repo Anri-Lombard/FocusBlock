@@ -25,7 +25,7 @@ struct StatusCommand: ParsableCommand {
         let elapsedMinutes = Int(elapsed / 60)
         let remainingMinutes = max(0, Int(remaining / 60))
 
-        let progress = Double(elapsed) / Double(session.durationSeconds)
+        let progress = min(1.0, Double(elapsed) / Double(session.durationSeconds))
         let progressPercent = Int(progress * 100)
 
         print("🔒 Active Focus Session")
@@ -45,7 +45,12 @@ struct StatusCommand: ParsableCommand {
         let endDate = Date(timeIntervalSince1970: TimeInterval(session.endTime))
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
-        print("Ends at \(formatter.string(from: endDate))")
+
+        if remaining <= 0 {
+            print("Session completed! Run 'focus stop' to finish. ✅")
+        } else {
+            print("Ends at \(formatter.string(from: endDate))")
+        }
     }
 
     private func formatDuration(_ minutes: Int) -> String {

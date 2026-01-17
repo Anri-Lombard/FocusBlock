@@ -23,6 +23,59 @@ public class BlockEngine {
         return contents.contains(blockMarkerStart)
     }
 
+    public func forceCleanup() throws {
+        let commonSites = [
+            "youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be",
+            "x.com", "www.x.com", "twitter.com", "www.twitter.com", "mobile.twitter.com",
+            "reddit.com", "www.reddit.com", "old.reddit.com", "new.reddit.com",
+            "linkedin.com", "www.linkedin.com"
+        ]
+
+        let contents = try String(contentsOfFile: hostsPath, encoding: .utf8)
+        let lines = contents.components(separatedBy: .newlines)
+
+        var newLines: [String] = []
+        var inBlockSection = false
+
+        for line in lines {
+            if line == blockMarkerStart {
+                inBlockSection = true
+                continue
+            }
+            if line == blockMarkerEnd {
+                inBlockSection = false
+                continue
+            }
+
+            if !inBlockSection {
+                let trimmed = line.trimmingCharacters(in: .whitespaces)
+                var shouldKeep = true
+
+                for site in commonSites {
+                    if trimmed.hasSuffix(site) && (trimmed.hasPrefix("127.0.0.1") || trimmed.hasPrefix("::1")) {
+                        shouldKeep = false
+                        break
+                    }
+                }
+
+                if shouldKeep {
+                    newLines.append(line)
+                }
+            }
+        }
+
+        let newContents = newLines.joined(separator: "\n")
+
+        let tempFile = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("hosts.tmp")
+        try newContents.write(to: tempFile, atomically: true, encoding: .utf8)
+
+        try runSudoCommand(["/bin/cp", tempFile.path, hostsPath])
+
+        try FileManager.default.removeItem(at: tempFile)
+        try flushDNSCache()
+    }
+
     private func generateHostsEntries(for sites: [String]) -> String {
         var entries = [blockMarkerStart]
 
@@ -67,34 +120,31 @@ public class BlockEngine {
             .appendingPathComponent("hosts.tmp")
         try newContents.write(to: tempFile, atomically: true, encoding: .utf8)
 
-        let sudoProcess = Process()
-        sudoProcess.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
-        sudoProcess.arguments = ["cp", tempFile.path, hostsPath]
-
-        try sudoProcess.run()
-        sudoProcess.waitUntilExit()
-
-        if sudoProcess.terminationStatus != 0 {
-            throw BlockEngineError.sudoFailed
-        }
+        try runSudoCommand(["/bin/cp", tempFile.path, hostsPath])
 
         try FileManager.default.removeItem(at: tempFile)
     }
 
+    private func runSudoCommand(_ arguments: [String]) throws {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
+        process.arguments = arguments
+
+        process.standardInput = FileHandle.standardInput
+        process.standardOutput = FileHandle.standardOutput
+        process.standardError = FileHandle.standardError
+
+        try process.run()
+        process.waitUntilExit()
+
+        if process.terminationStatus != 0 {
+            throw BlockEngineError.sudoFailed
+        }
+    }
+
     private func flushDNSCache() throws {
-        let flushProcess = Process()
-        flushProcess.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
-        flushProcess.arguments = ["dscacheutil", "-flushcache"]
-
-        try flushProcess.run()
-        flushProcess.waitUntilExit()
-
-        let killProcess = Process()
-        killProcess.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
-        killProcess.arguments = ["killall", "-HUP", "mDNSResponder"]
-
-        try killProcess.run()
-        killProcess.waitUntilExit()
+        try runSudoCommand(["dscacheutil", "-flushcache"])
+        try runSudoCommand(["killall", "-HUP", "mDNSResponder"])
     }
 }
 
