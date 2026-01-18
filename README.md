@@ -2,6 +2,8 @@
 
 A macOS focus session manager that hard-blocks distracting websites during timed focus sessions.
 
+> **Note**: I built this for myself to keep focus on what matters. It's a work in progress, built mainly with Claude Opus 4.5.
+
 ## Features
 
 - 🔒 **Hard Blocking**: Multi-layer blocking via /etc/hosts modification + DNS cache flushing
@@ -74,9 +76,6 @@ View comprehensive statistics including:
 - Average session duration
 - GitHub-style activity heatmap
 
-### `focus streak`
-Display current and longest streak information
-
 ### `focus history [--limit <N>]`
 Show recent session history (default: 10 sessions)
 
@@ -124,13 +123,11 @@ Session data and statistics are stored at:
 
 ## Development Status
 
-**Phase 1 & 2: ✅ Complete**
+**Phase 1-3: ✅ Complete**
 - Core library (session management, blocking engine, stats tracking)
 - CLI tool with all commands
 - Configuration management
 - Statistics visualization
-
-**Phase 3: 🚧 Planned**
 - Background daemon for session monitoring
 - Hosts file integrity checking
 - Launch agent setup
@@ -138,7 +135,6 @@ Session data and statistics are stored at:
 **Phase 4: 🚧 Planned**
 - Menu bar app with SwiftUI
 - Real-time session timer
-- Notifications
 
 ## Project Structure
 
