@@ -1,13 +1,12 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct DaemonCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "daemon",
         abstract: "Manage the FocusBlock background daemon",
-        subcommands: [Install.self, Uninstall.self, Status.self, Restart.self, Logs.self, DisableDoH.self, EnableDoH.self, VerifyDoH.self]
-    )
+        subcommands: [Install.self, Uninstall.self, Status.self, Restart.self, Logs.self, DisableDoH.self, EnableDoH.self, VerifyDoH.self])
 }
 
 extension DaemonCommand {
@@ -41,7 +40,7 @@ extension DaemonCommand {
             let possiblePaths = [
                 "./Scripts/install-daemon.sh",
                 "../Scripts/install-daemon.sh",
-                "../../Scripts/install-daemon.sh"
+                "../../Scripts/install-daemon.sh",
             ]
 
             for path in possiblePaths {
@@ -84,7 +83,7 @@ extension DaemonCommand {
             let possiblePaths = [
                 "./Scripts/uninstall-daemon.sh",
                 "../Scripts/uninstall-daemon.sh",
-                "../../Scripts/uninstall-daemon.sh"
+                "../../Scripts/uninstall-daemon.sh",
             ]
 
             for path in possiblePaths {
@@ -187,8 +186,7 @@ extension DaemonCommand {
     struct DisableDoH: ParsableCommand {
         static let configuration = CommandConfiguration(
             commandName: "disable-doh",
-            abstract: "Disable DNS over HTTPS in browsers"
-        )
+            abstract: "Disable DNS over HTTPS in browsers")
 
         func run() throws {
             let disabler = try DohDisabler()
@@ -224,8 +222,7 @@ extension DaemonCommand {
     struct EnableDoH: ParsableCommand {
         static let configuration = CommandConfiguration(
             commandName: "enable-doh",
-            abstract: "Re-enable DNS over HTTPS in browsers"
-        )
+            abstract: "Re-enable DNS over HTTPS in browsers")
 
         func run() throws {
             let disabler = try DohDisabler()
@@ -259,8 +256,7 @@ extension DaemonCommand {
     struct VerifyDoH: ParsableCommand {
         static let configuration = CommandConfiguration(
             commandName: "verify-doh",
-            abstract: "Check DoH status for all browsers"
-        )
+            abstract: "Check DoH status for all browsers")
 
         func run() throws {
             let disabler = try DohDisabler()
@@ -278,11 +274,11 @@ extension DaemonCommand {
                 print("\(icon) \(browser.name): DoH \(statusText)")
             }
 
-            let installedBrowsers = status.browsers.filter { $0.installed }
+            let installedBrowsers = status.browsers.filter(\.installed)
             if installedBrowsers.isEmpty {
                 print("No supported browsers found.")
             } else {
-                let allDisabled = installedBrowsers.allSatisfy { $0.dohDisabled }
+                let allDisabled = installedBrowsers.allSatisfy(\.dohDisabled)
                 if allDisabled {
                     print("\n✅ All installed browsers have DoH disabled.")
                 } else {

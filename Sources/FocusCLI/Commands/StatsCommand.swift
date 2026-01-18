@@ -1,12 +1,11 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct StatsCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "stats",
-        abstract: "Display focus statistics and heatmap"
-    )
+        abstract: "Display focus statistics and heatmap")
 
     @Option(name: .long, help: "Range: week, month, year, or all")
     var range: String?
@@ -43,7 +42,7 @@ struct StatsCommand: ParsableCommand {
         let hours = totalMinutes / 60
         let minutes = totalMinutes % 60
 
-        if hours > 0 && minutes > 0 {
+        if hours > 0, minutes > 0 {
             return "\(hours)h \(minutes)m"
         } else if hours > 0 {
             return "\(hours)h"

@@ -1,12 +1,11 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct UnblockCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "unblock",
-        abstract: "Remove all site blocks (emergency use)"
-    )
+        abstract: "Remove all site blocks (emergency use)")
 
     func run() throws {
         let blockEngine = BlockEngine()

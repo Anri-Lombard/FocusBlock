@@ -1,13 +1,12 @@
-import ArgumentParser
-import Foundation
-import FocusBlockCore
 import AppKit
+import ArgumentParser
+import FocusBlockCore
+import Foundation
 
 struct StartCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "start",
-        abstract: "Start a focus session"
-    )
+        abstract: "Start a focus session")
 
     @Argument(help: "Session duration in minutes (default: configured value)")
     var duration: Int?
@@ -34,8 +33,7 @@ struct StartCommand: ParsableCommand {
 
         let session = try sessionManager.startSession(
             durationMinutes: durationToUse,
-            sites: sitesToBlock
-        )
+            sites: sitesToBlock)
 
         let blockedSites = try sessionManager.getBlockedSites(for: session.id)
         print("Blocking \(blockedSites.count) sites:")
@@ -56,7 +54,7 @@ struct StartCommand: ParsableCommand {
     private func formatDuration(_ minutes: Int) -> String {
         let hours = minutes / 60
         let mins = minutes % 60
-        if hours > 0 && mins > 0 {
+        if hours > 0, mins > 0 {
             return "\(hours)h \(mins)m"
         } else if hours > 0 {
             return "\(hours)h"
@@ -71,7 +69,7 @@ struct StartCommand: ParsableCommand {
             "company.thebrowser.Browser",
             "com.google.Chrome",
             "com.brave.Browser",
-            "org.mozilla.firefox"
+            "org.mozilla.firefox",
         ]
 
         var runningBrowsers: [(name: String, app: NSRunningApplication)] = []
@@ -87,7 +85,7 @@ struct StartCommand: ParsableCommand {
             return
         }
 
-        let browserNames = runningBrowsers.map { $0.name }.joined(separator: ", ")
+        let browserNames = runningBrowsers.map(\.name).joined(separator: ", ")
         print("\n⚠️  Warning: \(browserNames) is currently running.")
         print("   For website blocking to work properly, the browser needs to be restarted.")
 

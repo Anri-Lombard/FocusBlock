@@ -1,12 +1,11 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct StatusCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "status",
-        abstract: "Show current session status"
-    )
+        abstract: "Show current session status")
 
     func run() throws {
         let (_, sessionManager, _, _) = try initializeCore()

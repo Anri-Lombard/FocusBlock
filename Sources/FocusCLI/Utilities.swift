@@ -1,5 +1,5 @@
-import Foundation
 import FocusBlockCore
+import Foundation
 
 func initializeCore() throws -> (DatabaseManager, SessionManager, StatsTracker, Configuration) {
     let db = try DatabaseManager()

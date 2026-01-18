@@ -1,5 +1,5 @@
-import Foundation
 import AppKit
+import Foundation
 
 public class NotificationManager {
     private var notificationsAvailable = true
@@ -50,28 +50,24 @@ public class NotificationManager {
     public func sessionStarted(durationMinutes: Int) {
         send(
             title: "Focus Session Started",
-            body: "Stay focused for \(durationMinutes) minutes! 🎯"
-        )
+            body: "Stay focused for \(durationMinutes) minutes! 🎯")
     }
 
     public func sessionCompleted() {
         send(
             title: "Focus Session Completed",
-            body: "Great work! Session finished successfully. ✅"
-        )
+            body: "Great work! Session finished successfully. ✅")
     }
 
     public func browserKilled(browserName: String) {
         send(
             title: "FocusBlock Active",
-            body: "\(browserName) was closed. Stay focused! 💪"
-        )
+            body: "\(browserName) was closed. Stay focused! 💪")
     }
 
     public func hostsFileTampered() {
         send(
             title: "FocusBlock Alert",
-            body: "Hosts file was modified. Blocks have been re-applied. 🔒"
-        )
+            body: "Hosts file was modified. Blocks have been re-applied. 🔒")
     }
 }

@@ -9,12 +9,14 @@ public struct StatsSnapshot {
     public let averageSessionMinutes: Int
     public let heatmapData: [String: Int]
 
-    public init(currentStreak: Int,
-                longestStreak: Int,
-                totalFocusTimeMinutes: Int,
-                sessionsThisWeek: Int,
-                averageSessionMinutes: Int,
-                heatmapData: [String: Int]) {
+    public init(
+        currentStreak: Int,
+        longestStreak: Int,
+        totalFocusTimeMinutes: Int,
+        sessionsThisWeek: Int,
+        averageSessionMinutes: Int,
+        heatmapData: [String: Int])
+    {
         self.currentStreak = currentStreak
         self.longestStreak = longestStreak
         self.totalFocusTimeMinutes = totalFocusTimeMinutes
@@ -30,8 +32,8 @@ public class StatsTracker {
 
     public init(db: DatabaseManager) {
         self.db = db
-        self.dateFormatter = DateFormatter()
-        self.dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
     }
 
     public func getStatsSnapshot() throws -> StatsSnapshot {
@@ -48,8 +50,7 @@ public class StatsTracker {
             totalFocusTimeMinutes: totalTime,
             sessionsThisWeek: sessionsThisWeek,
             averageSessionMinutes: averageSession,
-            heatmapData: heatmap
-        )
+            heatmapData: heatmap)
     }
 
     public func calculateCurrentStreak() throws -> Int {
@@ -61,7 +62,7 @@ public class StatsTracker {
         var streak = 0
         var checkDate = today
 
-        for _ in 0..<365 {
+        for _ in 0 ..< 365 {
             let dateString = dateFormatter.string(from: checkDate)
             if stats.contains(where: { $0.date == dateString && $0.totalMinutes > 0 }) {
                 streak += 1

@@ -1,14 +1,14 @@
-import Foundation
 import AppKit
+import Foundation
 
 public class BrowserMonitor {
     private let browserIdentifiers = [
-        "company.thebrowser.Browser",  // Arc
+        "company.thebrowser.Browser", // Arc
         "com.google.Chrome",
         "com.brave.Browser",
         "org.mozilla.firefox",
         "com.microsoft.edgemac",
-        "com.apple.Safari"
+        "com.apple.Safari",
     ]
 
     private let notificationManager: NotificationManager
@@ -45,7 +45,8 @@ public class BrowserMonitor {
 
         for app in runningApps {
             if let bundleId = app.bundleIdentifier,
-               browserIdentifiers.contains(bundleId) {
+               browserIdentifiers.contains(bundleId)
+            {
                 return true
             }
         }

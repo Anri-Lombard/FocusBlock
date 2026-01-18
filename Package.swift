@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "FocusBlock",
     platforms: [
-        .macOS(.v11)
+        .macOS(.v11),
     ],
     products: [
         .library(
@@ -41,5 +41,4 @@ let package = Package(
         .testTarget(
             name: "FocusBlockCoreTests",
             dependencies: ["FocusBlockCore"]),
-    ]
-)
+    ])

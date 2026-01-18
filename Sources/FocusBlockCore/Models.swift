@@ -15,12 +15,14 @@ public struct Session: Codable, FetchableRecord, PersistableRecord {
     public var status: SessionStatus
     public var createdAt: Int64
 
-    public init(id: String = UUID().uuidString,
-                startTime: Int64,
-                endTime: Int64,
-                durationSeconds: Int,
-                status: SessionStatus = .active,
-                createdAt: Int64 = Int64(Date().timeIntervalSince1970)) {
+    public init(
+        id: String = UUID().uuidString,
+        startTime: Int64,
+        endTime: Int64,
+        durationSeconds: Int,
+        status: SessionStatus = .active,
+        createdAt: Int64 = Int64(Date().timeIntervalSince1970))
+    {
         self.id = id
         self.startTime = startTime
         self.endTime = endTime
@@ -68,11 +70,13 @@ public struct DailyStats: Codable, FetchableRecord, PersistableRecord {
     public var longestSession: Int
     public var createdAt: Int64
 
-    public init(date: String,
-                totalMinutes: Int = 0,
-                sessionCount: Int = 0,
-                longestSession: Int = 0,
-                createdAt: Int64 = Int64(Date().timeIntervalSince1970)) {
+    public init(
+        date: String,
+        totalMinutes: Int = 0,
+        sessionCount: Int = 0,
+        longestSession: Int = 0,
+        createdAt: Int64 = Int64(Date().timeIntervalSince1970))
+    {
         self.date = date
         self.totalMinutes = totalMinutes
         self.sessionCount = sessionCount
@@ -98,11 +102,13 @@ public struct Config: Codable {
     public var dohRestoreOnUninstall: Bool
     public var dohExcludedBrowsers: [String]
 
-    public init(defaultDuration: Int = 90,
-                defaultSites: [String] = Config.defaultBlockedSites,
-                dohEnabled: Bool = true,
-                dohRestoreOnUninstall: Bool = true,
-                dohExcludedBrowsers: [String] = []) {
+    public init(
+        defaultDuration: Int = 90,
+        defaultSites: [String] = Config.defaultBlockedSites,
+        dohEnabled: Bool = true,
+        dohRestoreOnUninstall: Bool = true,
+        dohExcludedBrowsers: [String] = [])
+    {
         self.defaultDuration = defaultDuration
         self.defaultSites = defaultSites
         self.dohEnabled = dohEnabled
@@ -131,6 +137,6 @@ public struct Config: Codable {
         "youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be",
         "x.com", "www.x.com", "twitter.com", "www.twitter.com", "mobile.twitter.com",
         "reddit.com", "www.reddit.com", "old.reddit.com", "new.reddit.com",
-        "linkedin.com", "www.linkedin.com"
+        "linkedin.com", "www.linkedin.com",
     ]
 }

@@ -1,5 +1,5 @@
-import Foundation
 import FocusBlockCore
+import Foundation
 
 var isRunning = true
 
@@ -22,8 +22,8 @@ func initializeCore() throws -> (
     config: Configuration,
     notificationManager: NotificationManager,
     browserMonitor: BrowserMonitor,
-    integrityChecker: HostsIntegrityChecker
-) {
+    integrityChecker: HostsIntegrityChecker)
+{
     let db = try DatabaseManager()
     let blockEngine = BlockEngine()
     let config = try Configuration()
@@ -37,10 +37,10 @@ func initializeCore() throws -> (
 
 func runMonitoringLoop(
     sessionManager: SessionManager,
-    browserMonitor: BrowserMonitor,
+    browserMonitor _: BrowserMonitor,
     integrityChecker: HostsIntegrityChecker,
-    notificationManager: NotificationManager
-) throws {
+    notificationManager _: NotificationManager) throws
+{
     guard let session = try sessionManager.getActiveSession() else {
         return
     }
@@ -67,7 +67,7 @@ do {
         print("Skipped (not installed): \(result.skipped.joined(separator: ", "))")
     }
     if !result.failed.isEmpty {
-        print("Failed to disable DoH for: \(result.failed.map { $0.0 }.joined(separator: ", "))")
+        print("Failed to disable DoH for: \(result.failed.map(\.0).joined(separator: ", "))")
     }
 
     print("FocusBlock daemon started successfully")
@@ -79,8 +79,7 @@ do {
                 sessionManager: core.sessionManager,
                 browserMonitor: core.browserMonitor,
                 integrityChecker: core.integrityChecker,
-                notificationManager: core.notificationManager
-            )
+                notificationManager: core.notificationManager)
         } catch {
             print("Error in monitoring loop: \(error)")
         }

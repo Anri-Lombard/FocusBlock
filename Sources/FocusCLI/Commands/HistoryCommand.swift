@@ -1,12 +1,11 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct HistoryCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "history",
-        abstract: "Show recent session history"
-    )
+        abstract: "Show recent session history")
 
     @Option(name: .long, help: "Number of sessions to show")
     var limit: Int = 10

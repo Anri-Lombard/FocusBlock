@@ -28,7 +28,7 @@ public class BlockEngine {
             "youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be",
             "x.com", "www.x.com", "twitter.com", "www.twitter.com", "mobile.twitter.com",
             "reddit.com", "www.reddit.com", "old.reddit.com", "new.reddit.com",
-            "linkedin.com", "www.linkedin.com"
+            "linkedin.com", "www.linkedin.com",
         ]
 
         let contents = try String(contentsOfFile: hostsPath, encoding: .utf8)
@@ -52,7 +52,7 @@ public class BlockEngine {
                 var shouldKeep = true
 
                 for site in commonSites {
-                    if trimmed.hasSuffix(site) && (trimmed.hasPrefix("127.0.0.1") || trimmed.hasPrefix("::1")) {
+                    if trimmed.hasSuffix(site), trimmed.hasPrefix("127.0.0.1") || trimmed.hasPrefix("::1") {
                         shouldKeep = false
                         break
                     }
@@ -109,7 +109,7 @@ public class BlockEngine {
             }
         }
 
-        if let entries = entries {
+        if let entries {
             newLines.append("")
             newLines.append(entries)
         }
@@ -152,7 +152,7 @@ public class BlockEngine {
             let inputPipe = Pipe()
             process.standardInput = inputPipe
             process.standardOutput = FileHandle.standardOutput
-            process.standardError = FileHandle.nullDevice  // Hide "Password:" prompt from sudo
+            process.standardError = FileHandle.nullDevice // Hide "Password:" prompt from sudo
 
             try process.run()
 
@@ -187,11 +187,11 @@ public enum BlockEngineError: Error, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .sudoFailed:
-            return "Failed to modify hosts file. sudo may have been cancelled or failed."
+            "Failed to modify hosts file. sudo may have been cancelled or failed."
         case .hostsFileNotFound:
-            return "Hosts file not found at /etc/hosts"
+            "Hosts file not found at /etc/hosts"
         case .insufficientPermissions:
-            return "Insufficient permissions to modify hosts file"
+            "Insufficient permissions to modify hosts file"
         }
     }
 }

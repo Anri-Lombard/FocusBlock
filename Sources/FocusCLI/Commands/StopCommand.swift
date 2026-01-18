@@ -1,12 +1,11 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct StopCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "stop",
-        abstract: "Stop the active focus session"
-    )
+        abstract: "Stop the active focus session")
 
     @Flag(name: .long, help: "Force stop even if session hasn't ended (emergency use only)")
     var force: Bool = false
@@ -53,7 +52,7 @@ struct StopCommand: ParsableCommand {
     private func formatDuration(_ minutes: Int) -> String {
         let hours = minutes / 60
         let mins = minutes % 60
-        if hours > 0 && mins > 0 {
+        if hours > 0, mins > 0 {
             return "\(hours)h \(mins)m"
         } else if hours > 0 {
             return "\(hours)h"
@@ -63,6 +62,6 @@ struct StopCommand: ParsableCommand {
     }
 
     private func formatTime(minutes: Int, seconds: Int) -> String {
-        return String(format: "%dm %02ds", minutes, seconds)
+        String(format: "%dm %02ds", minutes, seconds)
     }
 }

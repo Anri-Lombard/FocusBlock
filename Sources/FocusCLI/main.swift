@@ -1,6 +1,6 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct FocusCLI: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -15,9 +15,8 @@ struct FocusCLI: ParsableCommand {
             HistoryCommand.self,
             ConfigCommand.self,
             UnblockCommand.self,
-            DaemonCommand.self
-        ]
-    )
+            DaemonCommand.self,
+        ])
 }
 
 FocusCLI.main()

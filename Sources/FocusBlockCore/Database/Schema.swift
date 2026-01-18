@@ -11,8 +11,7 @@ public class DatabaseManager {
             for: .applicationSupportDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
-            create: true
-        )
+            create: true)
 
         let focusBlockDir = appSupportURL.appendingPathComponent("FocusBlock", isDirectory: true)
         try fileManager.createDirectory(at: focusBlockDir, withIntermediateDirectories: true)

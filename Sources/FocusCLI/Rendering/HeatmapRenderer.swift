@@ -53,7 +53,7 @@ struct HeatmapRenderer {
             }
 
             // Show exactly 52 weeks
-            for _ in 0..<weeks {
+            for _ in 0 ..< weeks {
                 let dateString = dateFormatter.string(from: currentDate)
 
                 // Check if date is in the future
@@ -85,7 +85,7 @@ struct HeatmapRenderer {
         var labels: [Character] = Array(repeating: " ", count: weeks)
         var currentDate = startDate
 
-        for i in 0..<weeks {
+        for i in 0 ..< weeks {
             let month = calendar.component(.month, from: currentDate)
             let year = calendar.component(.year, from: currentDate)
 
@@ -102,7 +102,7 @@ struct HeatmapRenderer {
             }
 
             // Place label if it's a new month and won't overwrite existing label
-            if isNewMonth && month >= 1 && month <= calendar.monthSymbols.count {
+            if isNewMonth, month >= 1, month <= calendar.monthSymbols.count {
                 let monthName = String(calendar.monthSymbols[month - 1].prefix(3))
                 let charsToPlace = min(3, weeks - i)
 
@@ -110,14 +110,14 @@ struct HeatmapRenderer {
                 var canPlace = true
 
                 // Check if position immediately before has a letter (no space buffer)
-                if i > 0 && labels[i - 1] != " " {
+                if i > 0, labels[i - 1] != " " {
                     canPlace = false
                 }
 
                 // Check if the positions we need are available
                 if canPlace {
-                    for j in 0..<charsToPlace {
-                        if i + j < weeks && labels[i + j] != " " {
+                    for j in 0 ..< charsToPlace {
+                        if i + j < weeks, labels[i + j] != " " {
                             canPlace = false
                             break
                         }
@@ -125,7 +125,7 @@ struct HeatmapRenderer {
                 }
 
                 if canPlace {
-                    for j in 0..<charsToPlace {
+                    for j in 0 ..< charsToPlace {
                         labels[i + j] = monthName[monthName.index(monthName.startIndex, offsetBy: j)]
                     }
                 }
@@ -143,15 +143,15 @@ struct HeatmapRenderer {
     private func getBlockCharacter(for minutes: Int) -> String {
         switch minutes {
         case 0:
-            return "·"
-        case 1..<60:
-            return "░"
-        case 60..<120:
-            return "▒"
-        case 120..<180:
-            return "▓"
+            "·"
+        case 1 ..< 60:
+            "░"
+        case 60 ..< 120:
+            "▒"
+        case 120 ..< 180:
+            "▓"
         default:
-            return "█"
+            "█"
         }
     }
 }

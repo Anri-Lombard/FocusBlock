@@ -1,5 +1,5 @@
-import Foundation
 import AppKit
+import Foundation
 
 public enum DohError: Error, LocalizedError {
     case commandFailed(String)
@@ -8,9 +8,9 @@ public enum DohError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .commandFailed(let msg): return "Command failed: \(msg)"
-        case .fileAccessError(let msg): return "File access error: \(msg)"
-        case .stateLoadError(let msg): return "State load error: \(msg)"
+        case let .commandFailed(msg): "Command failed: \(msg)"
+        case let .fileAccessError(msg): "File access error: \(msg)"
+        case let .stateLoadError(msg): "State load error: \(msg)"
         }
     }
 }
@@ -77,12 +77,12 @@ public class DohDisabler {
 
         try FileManager.default.createDirectory(at: configDir, withIntermediateDirectories: true)
 
-        self.stateFilePath = configDir.appendingPathComponent("doh-state.json").path
+        stateFilePath = configDir.appendingPathComponent("doh-state.json").path
 
-        self.chromiumBrowsers = [
+        chromiumBrowsers = [
             (name: "Arc", bundleId: "company.thebrowser.Browser", key: "BuiltInDnsClientEnabled"),
             (name: "Chrome", bundleId: "com.google.Chrome", key: "BuiltInDnsClientEnabled"),
-            (name: "Brave", bundleId: "com.brave.Browser", key: "BuiltInDnsClientEnabled")
+            (name: "Brave", bundleId: "com.brave.Browser", key: "BuiltInDnsClientEnabled"),
         ]
     }
 
@@ -122,7 +122,7 @@ public class DohDisabler {
             } else {
                 let wasRunning = isBrowserRunning(bundleId: "org.mozilla.firefox")
                 try disableFirefox(profiles: profiles)
-                state.firefoxProfiles = profiles.map { $0.path }
+                state.firefoxProfiles = profiles.map(\.path)
                 success.append("Firefox (\(profiles.count) profile\(profiles.count == 1 ? "" : "s"))")
 
                 if wasRunning {
@@ -276,7 +276,7 @@ public class DohDisabler {
 
         let contents = try FileManager.default.contentsOfDirectory(at: profilesDir, includingPropertiesForKeys: nil)
 
-        return contents.filter { $0.hasDirectoryPath }.map {
+        return contents.filter(\.hasDirectoryPath).map {
             FirefoxProfile(path: $0.path, name: $0.lastPathComponent)
         }
     }
@@ -346,7 +346,7 @@ public class DohDisabler {
         }
 
         let runningApps = NSWorkspace.shared.runningApplications
-        let browserBundleIds = chromiumBrowsers.map { $0.bundleId } + ["org.mozilla.firefox"]
+        let browserBundleIds = chromiumBrowsers.map(\.bundleId) + ["org.mozilla.firefox"]
 
         for app in runningApps {
             guard let bundleId = app.bundleIdentifier else { continue }

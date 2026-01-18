@@ -27,8 +27,7 @@ public class SessionManager {
             startTime: now,
             endTime: endTime,
             durationSeconds: duration * 60,
-            status: .active
-        )
+            status: .active)
 
         try db.writer.write { db in
             try session.insert(db)
@@ -114,7 +113,7 @@ public class SessionManager {
             try BlockedSite
                 .filter(Column("session_id") == sessionId)
                 .fetchAll(db)
-                .map { $0.site }
+                .map(\.site)
         }
     }
 
@@ -136,8 +135,7 @@ public class SessionManager {
                     date: date,
                     totalMinutes: durationMinutes,
                     sessionCount: 1,
-                    longestSession: durationMinutes
-                )
+                    longestSession: durationMinutes)
                 try stats.insert(db)
             }
         }
@@ -152,14 +150,14 @@ public enum SessionError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .sessionAlreadyActive(let id):
-            return "A session is already active (ID: \(id)). Stop it before starting a new one."
+        case let .sessionAlreadyActive(id):
+            "A session is already active (ID: \(id)). Stop it before starting a new one."
         case .noActiveSession:
-            return "No active session found."
-        case .sessionNotExpired(let minutes):
-            return "Cannot stop session early. \(minutes) minutes remaining."
-        case .sessionNotFound(let id):
-            return "Session not found: \(id)"
+            "No active session found."
+        case let .sessionNotExpired(minutes):
+            "Cannot stop session early. \(minutes) minutes remaining."
+        case let .sessionNotFound(id):
+            "Session not found: \(id)"
         }
     }
 }

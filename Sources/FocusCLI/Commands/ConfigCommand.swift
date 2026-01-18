@@ -1,20 +1,18 @@
 import ArgumentParser
-import Foundation
 import FocusBlockCore
+import Foundation
 
 struct ConfigCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "config",
         abstract: "Manage FocusBlock configuration",
-        subcommands: [GetConfig.self, SetConfig.self, ResetConfig.self]
-    )
+        subcommands: [GetConfig.self, SetConfig.self, ResetConfig.self])
 }
 
 struct GetConfig: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "get",
-        abstract: "View current configuration"
-    )
+        abstract: "View current configuration")
 
     @Argument(help: "Configuration key (optional)")
     var key: String?
@@ -22,7 +20,7 @@ struct GetConfig: ParsableCommand {
     func run() throws {
         let (_, _, _, config) = try initializeCore()
 
-        if let key = key {
+        if let key {
             if let value = config.get(key: key) {
                 print("\(key): \(value)")
             } else {
@@ -44,8 +42,7 @@ struct GetConfig: ParsableCommand {
 struct SetConfig: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "set",
-        abstract: "Set a configuration value"
-    )
+        abstract: "Set a configuration value")
 
     @Argument(help: "Configuration key")
     var key: String
@@ -64,8 +61,7 @@ struct SetConfig: ParsableCommand {
 struct ResetConfig: ParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "reset",
-        abstract: "Reset configuration to defaults"
-    )
+        abstract: "Reset configuration to defaults")
 
     func run() throws {
         let (_, _, _, config) = try initializeCore()

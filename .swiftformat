@@ -1,0 +1,17 @@
+--swiftversion 5.9
+--indent 4
+--indentcase false
+--trimwhitespace always
+--voidtype void
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+--closingparen same-line
+--funcattributes prev-line
+--typeattributes prev-line
+--varattributes same-line
+--self remove
+--importgrouping alpha
+--semicolons never
+--commas always
+--exclude .build

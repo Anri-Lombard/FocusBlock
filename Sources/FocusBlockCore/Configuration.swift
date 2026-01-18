@@ -10,8 +10,7 @@ public class Configuration {
             for: .applicationSupportDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
-            create: true
-        )
+            create: true)
 
         let focusBlockDir = appSupportURL.appendingPathComponent("FocusBlock", isDirectory: true)
         try fileManager.createDirectory(at: focusBlockDir, withIntermediateDirectories: true)
@@ -46,11 +45,11 @@ public class Configuration {
     public func get(key: String) -> String? {
         switch key {
         case "default_duration":
-            return "\(config.defaultDuration)"
+            "\(config.defaultDuration)"
         case "default_sites":
-            return config.defaultSites.joined(separator: ",")
+            config.defaultSites.joined(separator: ",")
         default:
-            return nil
+            nil
         }
     }
 
@@ -88,10 +87,10 @@ public enum ConfigurationError: Error, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .invalidValue(let message):
-            return message
-        case .unknownKey(let key):
-            return "Unknown configuration key: \(key)"
+        case let .invalidValue(message):
+            message
+        case let .unknownKey(key):
+            "Unknown configuration key: \(key)"
         }
     }
 }
