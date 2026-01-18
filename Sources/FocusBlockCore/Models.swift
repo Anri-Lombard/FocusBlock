@@ -94,11 +94,37 @@ public struct DailyStats: Codable, FetchableRecord, PersistableRecord {
 public struct Config: Codable {
     public var defaultDuration: Int
     public var defaultSites: [String]
+    public var dohEnabled: Bool
+    public var dohRestoreOnUninstall: Bool
+    public var dohExcludedBrowsers: [String]
 
     public init(defaultDuration: Int = 90,
-                defaultSites: [String] = Config.defaultBlockedSites) {
+                defaultSites: [String] = Config.defaultBlockedSites,
+                dohEnabled: Bool = true,
+                dohRestoreOnUninstall: Bool = true,
+                dohExcludedBrowsers: [String] = []) {
         self.defaultDuration = defaultDuration
         self.defaultSites = defaultSites
+        self.dohEnabled = dohEnabled
+        self.dohRestoreOnUninstall = dohRestoreOnUninstall
+        self.dohExcludedBrowsers = dohExcludedBrowsers
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        defaultDuration = try container.decode(Int.self, forKey: .defaultDuration)
+        defaultSites = try container.decode([String].self, forKey: .defaultSites)
+        dohEnabled = try container.decodeIfPresent(Bool.self, forKey: .dohEnabled) ?? true
+        dohRestoreOnUninstall = try container.decodeIfPresent(Bool.self, forKey: .dohRestoreOnUninstall) ?? true
+        dohExcludedBrowsers = try container.decodeIfPresent([String].self, forKey: .dohExcludedBrowsers) ?? []
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case defaultDuration
+        case defaultSites
+        case dohEnabled
+        case dohRestoreOnUninstall
+        case dohExcludedBrowsers
     }
 
     public static let defaultBlockedSites = [

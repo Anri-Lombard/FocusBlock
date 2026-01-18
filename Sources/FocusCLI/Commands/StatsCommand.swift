@@ -20,17 +20,18 @@ struct StatsCommand: ParsableCommand {
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         print("")
 
-        print("Current Streak: \(snapshot.currentStreak) days \(snapshot.currentStreak > 0 ? "🔥" : "")")
-        print("Longest Streak: \(snapshot.longestStreak) days")
-        print("Total Focus Time: \(formatHoursMinutes(snapshot.totalFocusTimeMinutes))")
-        print("Sessions This Week: \(snapshot.sessionsThisWeek)")
+        print("🔥 Current Streak: \(snapshot.currentStreak) day\(snapshot.currentStreak == 1 ? "" : "s")")
+        print("🏆 Longest Streak: \(snapshot.longestStreak) day\(snapshot.longestStreak == 1 ? "" : "s")")
+        print("⏱️  Total Focus Time: \(formatHoursMinutes(snapshot.totalFocusTimeMinutes))")
+        print("📅 Sessions This Week: \(snapshot.sessionsThisWeek)")
 
         if snapshot.averageSessionMinutes > 0 {
-            print("Average Session: \(formatHoursMinutes(snapshot.averageSessionMinutes))")
+            print("📊 Average Session: \(formatHoursMinutes(snapshot.averageSessionMinutes))")
         }
 
         print("")
-        print("Activity Heatmap (Last 52 Weeks)")
+        let currentYear = Calendar.current.component(.year, from: Date())
+        print("Activity Heatmap (\(currentYear))")
         print("")
 
         let renderer = HeatmapRenderer()

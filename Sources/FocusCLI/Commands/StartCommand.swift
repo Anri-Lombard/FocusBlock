@@ -1,6 +1,7 @@
 import ArgumentParser
 import Foundation
 import FocusBlockCore
+import AppKit
 
 struct StartCommand: ParsableCommand {
     static let configuration = CommandConfiguration(
@@ -14,8 +15,13 @@ struct StartCommand: ParsableCommand {
     @Option(name: .long, help: "Comma-separated list of sites to block")
     var sites: String?
 
+    @Flag(name: .shortAndLong, help: "Skip browser restart prompt")
+    var yes: Bool = false
+
     func run() throws {
         let (_, sessionManager, _, config) = try initializeCore()
+
+        checkAndRestartBrowsers()
 
         let sitesToBlock: [String]? = sites?.split(separator: ",").map {
             String($0).trimmingCharacters(in: .whitespaces)
@@ -56,6 +62,80 @@ struct StartCommand: ParsableCommand {
             return "\(hours)h"
         } else {
             return "\(mins)m"
+        }
+    }
+
+    private func checkAndRestartBrowsers() {
+        let runningApps = NSWorkspace.shared.runningApplications
+        let browserIds = [
+            "company.thebrowser.Browser",
+            "com.google.Chrome",
+            "com.brave.Browser",
+            "org.mozilla.firefox"
+        ]
+
+        var runningBrowsers: [(name: String, app: NSRunningApplication)] = []
+        for app in runningApps {
+            guard let bundleId = app.bundleIdentifier else { continue }
+            guard browserIds.contains(bundleId) else { continue }
+
+            let name = app.localizedName ?? "Browser"
+            runningBrowsers.append((name: name, app: app))
+        }
+
+        if runningBrowsers.isEmpty {
+            return
+        }
+
+        let browserNames = runningBrowsers.map { $0.name }.joined(separator: ", ")
+        print("\n⚠️  Warning: \(browserNames) is currently running.")
+        print("   For website blocking to work properly, the browser needs to be restarted.")
+
+        let shouldRestart: Bool
+        if yes {
+            shouldRestart = true
+            print("   Auto-restarting browsers...")
+        } else {
+            print("\n   Restart browser now? (y/n): ", terminator: "")
+            fflush(stdout)
+
+            if let response = readLine()?.lowercased().trimmingCharacters(in: .whitespaces) {
+                shouldRestart = response == "y" || response == "yes"
+            } else {
+                shouldRestart = false
+            }
+        }
+
+        if shouldRestart {
+            print("\n   Restarting browsers...")
+
+            var browsersToReopen: [(name: String, bundleId: String)] = []
+            for (name, app) in runningBrowsers {
+                guard let bundleId = app.bundleIdentifier else { continue }
+
+                print("   Closing \(name)...")
+                browsersToReopen.append((name: name, bundleId: bundleId))
+
+                app.terminate()
+                Thread.sleep(forTimeInterval: 0.5)
+
+                if !app.isTerminated {
+                    app.forceTerminate()
+                }
+            }
+
+            Thread.sleep(forTimeInterval: 1.0)
+
+            for (name, bundleId) in browsersToReopen {
+                print("   Reopening \(name)...")
+                if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleId) {
+                    NSWorkspace.shared.openApplication(at: appURL, configuration: NSWorkspace.OpenConfiguration())
+                }
+            }
+
+            print("   ✅ Browsers restarted. Blocking is now active.\n")
+        } else {
+            print("\n   ⚠️  Continuing without restart. Blocking may not work until you restart the browser.\n")
         }
     }
 }

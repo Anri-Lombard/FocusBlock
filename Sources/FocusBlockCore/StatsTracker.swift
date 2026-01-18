@@ -65,10 +65,16 @@ public class StatsTracker {
             let dateString = dateFormatter.string(from: checkDate)
             if stats.contains(where: { $0.date == dateString && $0.totalMinutes > 0 }) {
                 streak += 1
-                checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+                guard let previousDate = calendar.date(byAdding: .day, value: -1, to: checkDate) else {
+                    break
+                }
+                checkDate = previousDate
             } else {
                 if checkDate == today {
-                    checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+                    guard let previousDate = calendar.date(byAdding: .day, value: -1, to: checkDate) else {
+                        break
+                    }
+                    checkDate = previousDate
                     continue
                 }
                 break

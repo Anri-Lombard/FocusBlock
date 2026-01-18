@@ -69,6 +69,23 @@ public class SessionManager {
         try updateDailyStats(for: session)
     }
 
+    public func autoCompleteSession(_ session: Session) throws {
+        var completed = session
+        completed.status = .completed
+
+        try db.writer.write { db in
+            try completed.update(db)
+        }
+
+        try blockEngine.disableBlocking()
+        try updateDailyStats(for: session)
+    }
+
+    public func isSessionExpired(_ session: Session) -> Bool {
+        let now = Int64(Date().timeIntervalSince1970)
+        return now >= session.endTime
+    }
+
     public func getActiveSession() throws -> Session? {
         try db.reader.read { db in
             try Session

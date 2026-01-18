@@ -12,10 +12,10 @@ struct FocusCLI: ParsableCommand {
             StopCommand.self,
             StatusCommand.self,
             StatsCommand.self,
-            StreakCommand.self,
             HistoryCommand.self,
             ConfigCommand.self,
-            UnblockCommand.self
+            UnblockCommand.self,
+            DaemonCommand.self
         ]
     )
 }

@@ -10,8 +10,16 @@ struct StatusCommand: ParsableCommand {
 
     func run() throws {
         let (_, sessionManager, _, _) = try initializeCore()
+        let blockEngine = BlockEngine()
 
         guard let session = try sessionManager.getActiveSession() else {
+            if try blockEngine.isBlocking() {
+                print("⚠️  No active session, but sites are still blocked!")
+                print("This can happen if the daemon couldn't clean up properly.")
+                print("")
+                print("Run 'focus unblock' to remove all blocks.")
+                return
+            }
             print("⚪️ No active session")
             print("Run 'focus start' to begin a new session")
             return
@@ -23,7 +31,10 @@ struct StatusCommand: ParsableCommand {
 
         let totalMinutes = session.durationSeconds / 60
         let elapsedMinutes = Int(elapsed / 60)
-        let remainingMinutes = max(0, Int(remaining / 60))
+        let elapsedSeconds = Int(elapsed % 60)
+        let remainingTotalSeconds = max(0, Int(remaining))
+        let remainingMinutes = remainingTotalSeconds / 60
+        let remainingSeconds = remainingTotalSeconds % 60
 
         let progress = min(1.0, Double(elapsed) / Double(session.durationSeconds))
         let progressPercent = Int(progress * 100)
@@ -31,8 +42,8 @@ struct StatusCommand: ParsableCommand {
         print("🔒 Active Focus Session")
         print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         print("Duration:  \(formatDuration(totalMinutes))")
-        print("Elapsed:   \(formatDuration(elapsedMinutes))")
-        print("Remaining: \(formatDuration(remainingMinutes))")
+        print("Elapsed:   \(formatTime(minutes: elapsedMinutes, seconds: elapsedSeconds))")
+        print("Remaining: \(formatTime(minutes: remainingMinutes, seconds: remainingSeconds))")
         print("")
 
         printProgressBar(progress: progress)
@@ -47,7 +58,20 @@ struct StatusCommand: ParsableCommand {
         formatter.dateFormat = "h:mm a"
 
         if remaining <= 0 {
-            print("Session completed! Run 'focus stop' to finish. ✅")
+            let overtime = abs(Int(remaining))
+            let overtimeMinutes = overtime / 60
+            let overtimeSeconds = overtime % 60
+
+            print("Session completed! ✅")
+            print("")
+
+            if overtimeMinutes > 0 || overtimeSeconds > 0 {
+                print("🎉 Well done! You stayed focused for \(formatTime(minutes: overtimeMinutes, seconds: overtimeSeconds)) longer than needed!")
+                print("")
+            }
+
+            print("⚠️  Sites are still blocked.")
+            print("Run 'focus stop' to unblock sites.")
         } else {
             print("Ends at \(formatter.string(from: endDate))")
         }
@@ -60,6 +84,16 @@ struct StatusCommand: ParsableCommand {
             return String(format: "%dh %02dm", hours, mins)
         } else {
             return "\(mins)m"
+        }
+    }
+
+    private func formatTime(minutes: Int, seconds: Int) -> String {
+        let hours = minutes / 60
+        let mins = minutes % 60
+        if hours > 0 {
+            return String(format: "%dh %02dm %02ds", hours, mins, seconds)
+        } else {
+            return String(format: "%dm %02ds", mins, seconds)
         }
     }
 

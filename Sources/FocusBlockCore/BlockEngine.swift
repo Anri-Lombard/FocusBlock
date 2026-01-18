@@ -126,16 +126,47 @@ public class BlockEngine {
     }
 
     private func runSudoCommand(_ arguments: [String]) throws {
+        // Check if sudo credentials are already cached
+        let checkProcess = Process()
+        checkProcess.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
+        checkProcess.arguments = ["-n", "true"]
+        checkProcess.standardOutput = FileHandle.nullDevice
+        checkProcess.standardError = FileHandle.nullDevice
+        try? checkProcess.run()
+        checkProcess.waitUntilExit()
+
+        let needsPassword = checkProcess.terminationStatus != 0
+
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/sudo")
-        process.arguments = arguments
 
-        process.standardInput = FileHandle.standardInput
-        process.standardOutput = FileHandle.standardOutput
-        process.standardError = FileHandle.standardError
+        if needsPassword {
+            // Read password securely with echo disabled using getpass()
+            guard let passBytes = getpass("Password: ") else {
+                throw BlockEngineError.sudoFailed
+            }
+            let password = String(cString: passBytes)
 
-        try process.run()
-        process.waitUntilExit()
+            process.arguments = ["-S"] + arguments
+
+            let inputPipe = Pipe()
+            process.standardInput = inputPipe
+            process.standardOutput = FileHandle.standardOutput
+            process.standardError = FileHandle.nullDevice  // Hide "Password:" prompt from sudo
+
+            try process.run()
+
+            inputPipe.fileHandleForWriting.write((password + "\n").data(using: .utf8)!)
+            inputPipe.fileHandleForWriting.closeFile()
+
+            process.waitUntilExit()
+        } else {
+            process.arguments = arguments
+            process.standardOutput = FileHandle.standardOutput
+            process.standardError = FileHandle.standardError
+            try process.run()
+            process.waitUntilExit()
+        }
 
         if process.terminationStatus != 0 {
             throw BlockEngineError.sudoFailed
