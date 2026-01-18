@@ -34,16 +34,22 @@ struct StopCommand: ParsableCommand {
             print("⚠️  Force stopping session early...")
         }
 
-        let overtime = abs(Int(remaining))
-        let overtimeMinutes = overtime / 60
-        let overtimeSeconds = overtime % 60
+        if remaining < 0 {
+            let overtime = abs(Int(remaining))
+            let overtimeMinutes = overtime / 60
+            let overtimeSeconds = overtime % 60
 
-        if overtimeMinutes > 0 || overtimeSeconds > 0 {
-            print("🎉 Well done! You stayed focused for \(formatTime(minutes: overtimeMinutes, seconds: overtimeSeconds)) longer than needed!")
-            print("")
+            if overtimeMinutes > 0 || overtimeSeconds > 0 {
+                print("🎉 Well done! You stayed focused for \(formatTime(minutes: overtimeMinutes, seconds: overtimeSeconds)) longer than needed!")
+                print("")
+            }
         }
 
         try sessionManager.autoCompleteSession(session)
+
+        if let daemonManager = try? DaemonManager() {
+            daemonManager.stopDaemon()
+        }
 
         print("✅ Focus session stopped and sites unblocked!")
         print("Great work! 💪")

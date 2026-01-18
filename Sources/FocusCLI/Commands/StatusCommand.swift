@@ -69,8 +69,19 @@ struct StatusCommand: ParsableCommand {
                 print("")
             }
 
-            print("⚠️  Sites are still blocked.")
-            print("Run 'focus stop' to unblock sites.")
+            print("Stop session and unblock sites? (y/n): ", terminator: "")
+            fflush(stdout)
+
+            if let response = readLine()?.lowercased().trimmingCharacters(in: .whitespaces),
+               response == "y" || response == "yes" {
+                try sessionManager.autoCompleteSession(session)
+                print("")
+                print("✅ Focus session stopped and sites unblocked!")
+                print("Great work! 💪")
+            } else {
+                print("")
+                print("Run 'focus stop' when ready to unblock sites.")
+            }
         } else {
             print("Ends at \(formatter.string(from: endDate))")
         }

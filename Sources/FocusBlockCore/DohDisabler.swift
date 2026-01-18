@@ -86,7 +86,7 @@ public class DohDisabler {
         ]
     }
 
-    public func disableDoH() throws -> DohResult {
+    public func disableDoH(restartBrowsers shouldRestart: Bool = true) throws -> DohResult {
         var success: [String] = []
         var skipped: [String] = []
         var failed: [(String, Error)] = []
@@ -139,7 +139,7 @@ public class DohDisabler {
 
         try saveState(state)
 
-        if !browsersToRestart.isEmpty {
+        if shouldRestart && !browsersToRestart.isEmpty {
             restartBrowsers(browsersToRestart)
         }
 

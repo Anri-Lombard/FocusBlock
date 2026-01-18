@@ -22,7 +22,8 @@ func initializeCore() throws -> (
     config: Configuration,
     notificationManager: NotificationManager,
     browserMonitor: BrowserMonitor,
-    integrityChecker: HostsIntegrityChecker)
+    integrityChecker: HostsIntegrityChecker,
+    softBlockMonitor: SoftBlockMonitor)
 {
     let db = try DatabaseManager()
     let blockEngine = BlockEngine()
@@ -31,15 +32,14 @@ func initializeCore() throws -> (
     let sessionManager = SessionManager(db: db, blockEngine: blockEngine, config: config)
     let browserMonitor = BrowserMonitor(notificationManager: notificationManager)
     let integrityChecker = HostsIntegrityChecker(blockEngine: blockEngine, notificationManager: notificationManager)
+    let softBlockMonitor = SoftBlockMonitor(config: config)
 
-    return (db, sessionManager, blockEngine, config, notificationManager, browserMonitor, integrityChecker)
+    return (db, sessionManager, blockEngine, config, notificationManager, browserMonitor, integrityChecker, softBlockMonitor)
 }
 
-func runMonitoringLoop(
+func runIntegrityCheck(
     sessionManager: SessionManager,
-    browserMonitor _: BrowserMonitor,
-    integrityChecker: HostsIntegrityChecker,
-    notificationManager _: NotificationManager) throws
+    integrityChecker: HostsIntegrityChecker) throws
 {
     guard let session = try sessionManager.getActiveSession() else {
         return
@@ -52,13 +52,24 @@ func runMonitoringLoop(
     }
 }
 
+func runSoftBlockCheck(
+    sessionManager: SessionManager,
+    softBlockMonitor: SoftBlockMonitor) throws
+{
+    guard try sessionManager.getActiveSession() != nil else {
+        return
+    }
+
+    softBlockMonitor.checkBrowsers()
+}
+
 do {
     setupSignalHandlers()
 
     let core = try initializeCore()
 
     let dohDisabler = try DohDisabler()
-    let result = try dohDisabler.disableDoH()
+    let result = try dohDisabler.disableDoH(restartBrowsers: false)
 
     if !result.success.isEmpty {
         print("DoH disabled for: \(result.success.joined(separator: ", "))")
@@ -73,18 +84,35 @@ do {
     print("FocusBlock daemon started successfully")
     print("Monitoring for active sessions...")
 
+    var loopCounter = 0
+    let integrityCheckInterval = 15
+    var integrityCheckDisabled = false
+
     while isRunning {
         do {
-            try runMonitoringLoop(
+            try runSoftBlockCheck(
                 sessionManager: core.sessionManager,
-                browserMonitor: core.browserMonitor,
-                integrityChecker: core.integrityChecker,
-                notificationManager: core.notificationManager)
+                softBlockMonitor: core.softBlockMonitor)
         } catch {
-            print("Error in monitoring loop: \(error)")
+            print("Error in soft block check: \(error)")
         }
 
-        sleep(30)
+        loopCounter += 1
+        if loopCounter >= integrityCheckInterval {
+            loopCounter = 0
+            if !integrityCheckDisabled {
+                do {
+                    try runIntegrityCheck(
+                        sessionManager: core.sessionManager,
+                        integrityChecker: core.integrityChecker)
+                } catch {
+                    integrityCheckDisabled = true
+                    print("Integrity checking disabled (no sudo access in daemon context)")
+                }
+            }
+        }
+
+        sleep(2)
     }
 
     print("FocusBlock daemon shut down")

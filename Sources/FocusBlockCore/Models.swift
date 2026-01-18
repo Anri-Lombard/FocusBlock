@@ -101,19 +101,25 @@ public struct Config: Codable {
     public var dohEnabled: Bool
     public var dohRestoreOnUninstall: Bool
     public var dohExcludedBrowsers: [String]
+    public var softBlockSites: [String]
+    public var softBlockGracePeriod: Int
 
     public init(
         defaultDuration: Int = 90,
         defaultSites: [String] = Config.defaultBlockedSites,
         dohEnabled: Bool = true,
         dohRestoreOnUninstall: Bool = true,
-        dohExcludedBrowsers: [String] = [])
+        dohExcludedBrowsers: [String] = [],
+        softBlockSites: [String] = [],
+        softBlockGracePeriod: Int = 300)
     {
         self.defaultDuration = defaultDuration
         self.defaultSites = defaultSites
         self.dohEnabled = dohEnabled
         self.dohRestoreOnUninstall = dohRestoreOnUninstall
         self.dohExcludedBrowsers = dohExcludedBrowsers
+        self.softBlockSites = softBlockSites
+        self.softBlockGracePeriod = softBlockGracePeriod
     }
 
     public init(from decoder: Decoder) throws {
@@ -123,6 +129,8 @@ public struct Config: Codable {
         dohEnabled = try container.decodeIfPresent(Bool.self, forKey: .dohEnabled) ?? true
         dohRestoreOnUninstall = try container.decodeIfPresent(Bool.self, forKey: .dohRestoreOnUninstall) ?? true
         dohExcludedBrowsers = try container.decodeIfPresent([String].self, forKey: .dohExcludedBrowsers) ?? []
+        softBlockSites = try container.decodeIfPresent([String].self, forKey: .softBlockSites) ?? []
+        softBlockGracePeriod = try container.decodeIfPresent(Int.self, forKey: .softBlockGracePeriod) ?? 300
     }
 
     enum CodingKeys: String, CodingKey {
@@ -131,6 +139,8 @@ public struct Config: Codable {
         case dohEnabled
         case dohRestoreOnUninstall
         case dohExcludedBrowsers
+        case softBlockSites
+        case softBlockGracePeriod
     }
 
     public static let defaultBlockedSites = [

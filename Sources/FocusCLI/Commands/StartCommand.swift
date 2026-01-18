@@ -20,7 +20,9 @@ struct StartCommand: ParsableCommand {
     func run() throws {
         let (_, sessionManager, _, config) = try initializeCore()
 
+        disableDoHSettings()
         checkAndRestartBrowsers()
+        flushDNSCache()
 
         let sitesToBlock: [String]? = sites?.split(separator: ",").map {
             String($0).trimmingCharacters(in: .whitespaces)
@@ -48,6 +50,18 @@ struct StartCommand: ParsableCommand {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         print("\n✅ Session started! Ends at \(formatter.string(from: endDate))")
+
+        do {
+            let daemonManager = try DaemonManager()
+            if !daemonManager.isDaemonRunning() {
+                if try daemonManager.startDaemon() {
+                    print("🔄 Background monitor started")
+                }
+            }
+        } catch {
+            print("⚠️  Could not start background monitor: \(error.localizedDescription)")
+        }
+
         print("Stay focused! 💪")
     }
 
@@ -135,5 +149,24 @@ struct StartCommand: ParsableCommand {
         } else {
             print("\n   ⚠️  Continuing without restart. Blocking may not work until you restart the browser.\n")
         }
+    }
+
+    private func disableDoHSettings() {
+        do {
+            let dohDisabler = try DohDisabler()
+            _ = try dohDisabler.disableDoH(restartBrowsers: false)
+        } catch {
+            // Silently continue - DoH disable is best-effort
+        }
+    }
+
+    private func flushDNSCache() {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/dscacheutil")
+        process.arguments = ["-flushcache"]
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
+        try? process.run()
+        process.waitUntilExit()
     }
 }
