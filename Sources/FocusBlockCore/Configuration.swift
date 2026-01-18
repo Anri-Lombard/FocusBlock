@@ -42,12 +42,32 @@ public class Configuration {
         }
     }
 
+    public var softBlockSites: [String] {
+        get { config.softBlockSites }
+        set {
+            config.softBlockSites = newValue
+            try? save()
+        }
+    }
+
+    public var softBlockGracePeriod: Int {
+        get { config.softBlockGracePeriod }
+        set {
+            config.softBlockGracePeriod = newValue
+            try? save()
+        }
+    }
+
     public func get(key: String) -> String? {
         switch key {
         case "default_duration":
             "\(config.defaultDuration)"
         case "default_sites":
             config.defaultSites.joined(separator: ",")
+        case "soft_sites":
+            config.softBlockSites.joined(separator: ",")
+        case "soft_grace_period":
+            "\(config.softBlockGracePeriod)"
         default:
             nil
         }
@@ -62,6 +82,13 @@ public class Configuration {
             config.defaultDuration = duration
         case "default_sites":
             config.defaultSites = value.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        case "soft_sites":
+            config.softBlockSites = value.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        case "soft_grace_period":
+            guard let period = Int(value), period > 0 else {
+                throw ConfigurationError.invalidValue("Grace period must be a positive integer (seconds)")
+            }
+            config.softBlockGracePeriod = period
         default:
             throw ConfigurationError.unknownKey(key)
         }

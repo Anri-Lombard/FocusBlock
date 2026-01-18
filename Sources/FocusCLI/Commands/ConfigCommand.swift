@@ -35,6 +35,15 @@ struct GetConfig: ParsableCommand {
             for site in config.defaultSites {
                 print("  • \(site)")
             }
+            print("soft_sites:")
+            if config.softBlockSites.isEmpty {
+                print("  (none)")
+            } else {
+                for site in config.softBlockSites {
+                    print("  • \(site)")
+                }
+            }
+            print("soft_grace_period: \(config.softBlockGracePeriod) seconds")
         }
     }
 }
