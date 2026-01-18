@@ -123,18 +123,14 @@ Session data and statistics are stored at:
 
 ## Development Status
 
-**Phase 1-3: ✅ Complete**
+**✅ Complete**
 - Core library (session management, blocking engine, stats tracking)
 - CLI tool with all commands
 - Configuration management
-- Statistics visualization
+- Statistics visualization (GitHub-style heatmap)
 - Background daemon for session monitoring
 - Hosts file integrity checking
 - Launch agent setup
-
-**Phase 4: 🚧 Planned**
-- Menu bar app with SwiftUI
-- Real-time session timer
 
 ## Project Structure
 
@@ -154,7 +150,7 @@ FocusBlock/
 │   │   ├── Utilities.swift
 │   │   ├── Commands/
 │   │   └── Rendering/
-│   └── FocusDaemon/         # Background daemon (planned)
+│   └── FocusDaemon/         # Background daemon
 ├── Tests/
 └── Package.swift
 ```
@@ -173,15 +169,6 @@ MIT License - See LICENSE file for details
 ## Contributing
 
 Contributions welcome! Please open an issue or PR.
-
-## Roadmap
-
-- [ ] Background daemon implementation
-- [ ] Menu bar app with SwiftUI
-- [ ] Browser process monitoring
-- [ ] Achievement system
-- [ ] Export stats to HTML
-- [ ] Alfred/Raycast integration
 
 ## Author
 
